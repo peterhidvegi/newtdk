@@ -54,20 +54,20 @@ public class WiFiDirectFragment extends Fragment implements WifiP2pManager.Chann
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
-        //manager = (WifiP2pManager) mActivity.getSystemService(Context.WIFI_P2P_SERVICE);
-        manager = ((MainActivity)mActivity).getManager();
-        channel = manager.initialize(mActivity, mActivity.getMainLooper(), null);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        manager = ((MainActivity)mActivity).manager;
+        channel = manager.initialize(mActivity, mActivity.getMainLooper(), null);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        mActivity = activity;
     }
 
     /** register the BroadcastReceiver with the intent values to be matched */

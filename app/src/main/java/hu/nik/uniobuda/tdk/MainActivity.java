@@ -74,10 +74,6 @@ public class MainActivity extends Activity{
     Button btnLeft;
     Button btnRight;
 
-    public WifiP2pManager getManager() {
-        return manager;
-    }
-
     WifiP2pManager manager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
