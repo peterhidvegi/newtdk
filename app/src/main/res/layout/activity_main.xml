@@ -1,0 +1,125 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    android:layout_weight="6">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="▼"
+            android:id="@+id/left"
+            android:rotation="180"
+            android:textSize="60dp"
+            android:background="@android:color/transparent"
+            android:textColor="@color/button_material_dark"/>
+
+    </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:orientation="horizontal"
+        android:weightSum="6">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:text="▼"
+            android:textColor="@color/button_material_dark"
+            android:textSize="60dp"
+            android:rotation="90"
+            android:id="@+id/down"
+            android:layout_gravity="center"
+            android:layout_weight="1"/>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_weight="4"
+            android:layout_height="match_parent"
+            android:id="@+id/container"
+            android:background="@drawable/border">
+        </FrameLayout>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:rotation="270"
+            android:layout_gravity="center"
+            android:text="▼"
+            android:id="@+id/up"
+            android:textColor="@color/button_material_dark"
+            android:textSize="60dp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:text="▼"
+            android:id="@+id/right"
+            android:textColor="@color/button_material_dark"
+            android:textSize="60dp"
+            android:rotation="0"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:weightSum="3">
+
+
+        <ImageButton
+            android:id="@+id/p2p_ctrl"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:src="@drawable/p2p"
+            android:background="@drawable/border"
+            android:rotation="90"
+            android:padding="5dp" />
+
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:rotation="90"
+            android:src="@drawable/menu"
+            android:background="@drawable/border"
+            android:id="@+id/btn_find_devices"
+            android:textAlignment="center"/>
+
+        <ImageButton
+            android:id="@+id/btn_reset"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:src="@drawable/reset"
+            android:background="@drawable/border"
+            android:rotation="90"
+            android:padding="5dp" />
+
+    </LinearLayout>
+
+</LinearLayout>
