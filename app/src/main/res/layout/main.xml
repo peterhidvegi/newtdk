@@ -3,25 +3,51 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-    <LinearLayout
+    android:layout_height="fill_parent"
+    android:layout_margin="5dp">
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal">
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_direct_enable"
+                android:src="@drawable/ic_action_on_off"/>
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_action_discover"
+                android:src="@drawable/ic_action_discover"/>
+        </LinearLayout>
+    <ScrollView
         android:layout_width="match_parent"
-        android:id="@+id/linearLayout1"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-        <fragment
-            class="hu.nik.uniobuda.tdk.DeviceListFragment"
-            android:id="@+id/frag_list"
+        android:id="@+id/scrollView">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/phone_list_height">
-            <!-- Preview: layout=@layout/row_devices -->
-        </fragment>
-        <fragment
-            class="hu.nik.uniobuda.tdk.DeviceDetailFragment"
-            android:id="@+id/frag_detail"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <!-- Preview: layout=@layout/device_detail -->
-        </fragment>
-    </LinearLayout>
+            android:id="@+id/linearLayout1"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <fragment
+                class="hu.nik.uniobuda.tdk.DeviceListFragment"
+                android:id="@+id/frag_list"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/phone_list_height">
+                <!-- Preview: layout=@layout/row_devices -->
+            </fragment>
+            <fragment
+                class="hu.nik.uniobuda.tdk.DeviceDetailFragment"
+                android:id="@+id/frag_detail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <!-- Preview: layout=@layout/device_detail -->
+            </fragment>
+        </LinearLayout>
+
+    </ScrollView>
+
 </LinearLayout>

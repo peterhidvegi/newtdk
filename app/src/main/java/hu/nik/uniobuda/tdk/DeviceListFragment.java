@@ -20,6 +20,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
+
 /**
  * Created by Peter on 2015.11.16..
  */
@@ -29,6 +31,7 @@ public class DeviceListFragment extends ListFragment implements WifiP2pManager.P
     ProgressDialog progressDialog = null;
     View mContentView = null;
     private WifiP2pDevice device;
+    EventBus eventBus = EventBus.getDefault();
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -75,7 +78,9 @@ public class DeviceListFragment extends ListFragment implements WifiP2pManager.P
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         WifiP2pDevice device = (WifiP2pDevice) getListAdapter().getItem(position);
-        ((DeviceActionListener) getActivity()).showDetails(device);
+        //((DeviceActionListener) getActivity()).showDetails(device);
+        eventBus.post(new WifiDirectFragmentShowDetailsEvent(device));
+
     }
 
     /**

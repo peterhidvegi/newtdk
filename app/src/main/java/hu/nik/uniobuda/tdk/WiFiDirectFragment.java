@@ -3,7 +3,6 @@ package hu.nik.uniobuda.tdk;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -14,12 +13,13 @@ import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.Toast;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by Peter on 2015.11.16..
@@ -34,6 +34,10 @@ public class WiFiDirectFragment extends Fragment implements WifiP2pManager.Chann
     private final IntentFilter intentFilter = new IntentFilter();
     private WifiP2pManager.Channel channel;
     private BroadcastReceiver receiver = null;
+    ImageButton btn_direct_enable;
+    ImageButton btn_action_discover;
+    View v;
+    EventBus eventBus = EventBus.getDefault();
 
     /**
      * @param isWifiP2pEnabled the isWifiP2pEnabled to set
@@ -45,9 +49,11 @@ public class WiFiDirectFragment extends Fragment implements WifiP2pManager.Chann
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.main);
 
-        // add necessary intent values to be matched.
+        if(!eventBus.isRegistered(this))
+        {
+            eventBus.register(this);
+        }
 
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
@@ -59,9 +65,42 @@ public class WiFiDirectFragment extends Fragment implements WifiP2pManager.Chann
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        manager = ((MainActivity)mActivity).manager;
+        v = inflater.inflate(R.layout.main, container, false);
+
+        btn_action_discover = (ImageButton)v.findViewById(R.id.btn_action_discover);
+        btn_direct_enable = (ImageButton)v.findViewById(R.id.btn_action_discover);
+        btn_direct_enable.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+            }
+        });
+        btn_action_discover.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final DeviceListFragment fragment = (DeviceListFragment) getFragmentManager()
+                        .findFragmentById(R.id.frag_list);
+                fragment.onInitiateDiscovery();
+                manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(mActivity, "Discovery Initiated",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(int reasonCode) {
+                        Toast.makeText(mActivity, "Discovery Failed : " + reasonCode,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
+        manager = ((MainActivity)mActivity).getManager();
         channel = manager.initialize(mActivity, mActivity.getMainLooper(), null);
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return v;
     }
 
     @Override
@@ -253,4 +292,18 @@ public class WiFiDirectFragment extends Fragment implements WifiP2pManager.Chann
         }
 
     }
+
+    public void onEvent(WifiDirectFragmentShowDetailsEvent event)
+    {
+       showDetails(event.getDevice());
+    }
+    public void onEvent(WifiDirectFragmentConnectEvent event) {
+        connect(event.getConfig());
+    }
+
+    public void onEvent(WifiDirectFragmentDisconnectEvent event)
+    {
+        disconnect();
+    }
+
 }

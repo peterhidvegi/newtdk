@@ -117,3 +117,9 @@ gradle/wrapper/gradle-wrapper.jar
 gradle/wrapper/gradle-wrapper.properties
 settings.gradle
 newtdk.iml
+WifiDirectDemo/app/build/intermediates/classes/debug/com/example/android/wifidirect/CameraActivity$1.class
+WifiDirectDemo/app/build/intermediates/classes/debug/com/example/android/wifidirect/CameraActivity$2.class
+WifiDirectDemo/app/build/intermediates/classes/debug/com/example/android/wifidirect/CameraActivity.class
+WifiDirectDemo/app/build/intermediates/pre-dexed/debug/support-v4-18.0.0-4f2ca221a68ae6d75313a5f2c34403e45f1f83e3.jar
+WifiDirectDemo/build/intermediates/gradle_project_sync_data.bin
+WifiDirectDemo/app/build/intermediates/res/debug/layout/camera.xml

@@ -16,6 +16,7 @@
 
 package com.example.android.wifidirect;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -76,6 +77,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
                 WifiP2pConfig config = new WifiP2pConfig();
                 config.deviceAddress = device.deviceAddress;
                 config.wps.setup = WpsInfo.PBC;
+                config.groupOwnerIntent = 0;
 
                 if (progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
@@ -109,15 +111,8 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 
                     @Override
                     public void onClick(View v) {
-                        // Allow user to pick an image from Gallery or other
-                        // registered apps
-                        /*original version
-                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                        intent.setType("image/*");
-                        startActivityForResult(intent, CHOOSE_FILE_RESULT_CODE);
-                        */
-                        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                        startActivityForResult(intent, 0);
+                        Intent i = new Intent(getActivity(), CameraActivity.class);
+                        startActivityForResult(i, 1);
                     }
                 });
 
@@ -129,20 +124,32 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 
         // User has picked an image. Transfer it to group owner i.e peer using
         // FileTransferService.
+
+        if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_OK) {
+                String result = data.getStringExtra("result");
+                byte[] bpdata = data.getByteArrayExtra("data");
+
+        /*
         Bitmap bp;
         bp = (Bitmap) data.getExtras().get("data");
-        Uri uri = data.getData();
-        TextView statusText = (TextView) mContentView.findViewById(R.id.status_text);
-        statusText.setText("Sending: " + uri);
-        Log.d(WiFiDirectActivity.TAG, "Intent----------- " + uri);
-        Intent serviceIntent = new Intent(getActivity(), FileTransferService.class);
-        serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
-        //serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, uri.toString());
-        serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PIC,convertByteToStream(bp));
-        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
-                info.groupOwnerAddress.getHostAddress());
-        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
-        getActivity().startService(serviceIntent);
+        */
+                Uri uri = data.getData();
+
+                TextView statusText = (TextView) mContentView.findViewById(R.id.status_text);
+                statusText.setText("Sending: " + uri);
+                Log.d(WiFiDirectActivity.TAG, "Intent----------- " + uri);
+                Intent serviceIntent = new Intent(getActivity(), FileTransferService.class);
+                serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
+                //serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH, uri.toString());
+                serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PIC, bpdata);
+                //    serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PIC,convertByteToStream(bp));
+                serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
+                        info.groupOwnerAddress.getHostAddress());
+                serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
+                getActivity().startService(serviceIntent);
+            }
+        }
     }
 
     @Override

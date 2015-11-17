@@ -29,6 +29,8 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import de.greenrobot.event.EventBus;
+
 /**
  * Created by Peter on 2015.11.16..
  */
@@ -40,6 +42,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     private WifiP2pDevice device;
     private WifiP2pInfo info;
     ProgressDialog progressDialog = null;
+    EventBus eventBus = EventBus.getDefault();
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -57,6 +60,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                 WifiP2pConfig config = new WifiP2pConfig();
                 config.deviceAddress = device.deviceAddress;
                 config.wps.setup = WpsInfo.PBC;
+                config.groupOwnerIntent =15;
 
                 if (progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
@@ -71,7 +75,9 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
 //                            }
 //                        }
                 );
-                ((DeviceListFragment.DeviceActionListener) getActivity()).connect(config);
+                //((DeviceListFragment.DeviceActionListener) getActivity()).connect(config);
+                eventBus.post(new WifiDirectFragmentConnectEvent(config));
+
 
             }
         });
@@ -81,7 +87,8 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
 
                     @Override
                     public void onClick(View v) {
-                        ((DeviceListFragment.DeviceActionListener) getActivity()).disconnect();
+                        //((DeviceListFragment.DeviceActionListener) getActivity()).disconnect();
+                        eventBus.post(new WifiDirectFragmentDisconnectEvent());
                     }
                 });
 
@@ -97,8 +104,11 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                         intent.setType("image/*");
                         startActivityForResult(intent, CHOOSE_FILE_RESULT_CODE);
                         */
+                        /*
                         Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                         startActivityForResult(intent, 0);
+                        */
+                        //TODO auto photo maker
                     }
                 });
 
