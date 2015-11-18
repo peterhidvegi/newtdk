@@ -74,6 +74,8 @@ public class MainActivity extends Activity{
     Button btnLeft;
     Button btnRight;
 
+    String status = "x";
+
     public WifiP2pManager getManager() {
         return manager;
     }
@@ -139,7 +141,7 @@ public class MainActivity extends Activity{
                 if(event.getAction() == MotionEvent.ACTION_DOWN)
                 {
                     btnUp.setTextColor(getResources().getColor(R.color.button_material_light));
-                    sendMessage("b");
+                    sendMessage("w");
                 }
                 else if(event.getAction() == MotionEvent.ACTION_UP)
                 {
@@ -156,7 +158,7 @@ public class MainActivity extends Activity{
                 if(event.getAction() == MotionEvent.ACTION_DOWN)
                 {
                     btnDown.setTextColor(getResources().getColor(R.color.button_material_light));
-                    sendMessage("s");
+                    sendMessage("x");
                 }
                 else if(event.getAction() == MotionEvent.ACTION_UP)
                 {
@@ -174,7 +176,8 @@ public class MainActivity extends Activity{
                 if(event.getAction() == MotionEvent.ACTION_DOWN)
                 {
                     btnLeft.setTextColor(getResources().getColor(R.color.button_material_light));
-                    sendMessage("k");
+                    sendMessage("a");
+
                 }
                 else if(event.getAction() == MotionEvent.ACTION_UP)
                 {
@@ -192,7 +195,7 @@ public class MainActivity extends Activity{
                 if(event.getAction() == MotionEvent.ACTION_DOWN)
                 {
                     btnRight.setTextColor(getResources().getColor(R.color.button_material_light));
-                    sendMessage("n");
+                    sendMessage("d");
                 }
                 else if(event.getAction() == MotionEvent.ACTION_UP)
                 {
@@ -253,31 +256,47 @@ public class MainActivity extends Activity{
                     @Override
                     public void run() {
                         //Right and left
-                        if(coordinates[1]>3) {
+                        if (coordinates[1] > 3) {
                             btnRight.setTextColor(getResources().getColor(R.color.button_material_light));
-                            sendMessage("n");
-                        }else if(coordinates[1]<-3)
-                        {
+
+                            if (status != "d") {
+                                sendMessage("d");
+                                status = "d";
+                            }
+
+
+                        } else if (coordinates[1] < -3) {
                             btnLeft.setTextColor(getResources().getColor(R.color.button_material_light));
-                            sendMessage("k");
-                        }else
-                        {
+
+                            if (status != "a") {
+                                sendMessage("a");
+                                status = "a";
+                            }
+                        } else {
                             btnLeft.setTextColor(getResources().getColor(R.color.button_material_dark));
                             btnRight.setTextColor(getResources().getColor(R.color.button_material_dark));
+
                         }
 
-                        if(coordinates[0]>3)
-                        {
+                        if (coordinates[0] > 3) {
                             btnDown.setTextColor(getResources().getColor(R.color.button_material_light));
-                            sendMessage("p");
-                        }else if(coordinates[0]<-3)
-                        {
-                            sendMessage("z");
+
+                            if (status != "s") {
+                                sendMessage("s");
+                                status = "s";
+                            }
+                        } else if (coordinates[0] < -3) {
+
+                            if (status != "w") {
+                                sendMessage("w");
+                                status = "w";
+                            }
                             btnUp.setTextColor(getResources().getColor(R.color.button_material_light));
-                        }else
-                        {
+                        } else {
                             btnUp.setTextColor(getResources().getColor(R.color.button_material_dark));
                             btnDown.setTextColor(getResources().getColor(R.color.button_material_dark));
+
+                            //sendMessage("x");
                         }
 
                         //Log.d("lefut",String.valueOf("x: "+(int)coordinates[0]+" y: "+coordinates[1]+" z:"+coordinates[2]));

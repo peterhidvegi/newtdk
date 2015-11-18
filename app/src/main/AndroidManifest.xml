@@ -30,6 +30,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".BitmapActivity" android:label="bitmap"/>
+
         <service android:enabled="true" android:name=".FileTransferService" />
 
     </application>

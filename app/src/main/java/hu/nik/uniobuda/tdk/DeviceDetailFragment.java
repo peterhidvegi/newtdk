@@ -1,10 +1,12 @@
 package hu.nik.uniobuda.tdk;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -20,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,10 +46,18 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
     private WifiP2pInfo info;
     ProgressDialog progressDialog = null;
     EventBus eventBus = EventBus.getDefault();
+    Activity mActivity;
+    static EventBus staticEventBus = EventBus.getDefault();
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mActivity = activity;
     }
 
     @Override
@@ -60,7 +71,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                 WifiP2pConfig config = new WifiP2pConfig();
                 config.deviceAddress = device.deviceAddress;
                 config.wps.setup = WpsInfo.PBC;
-                config.groupOwnerIntent =15;
+                config.groupOwnerIntent = 14;
 
                 if (progressDialog != null && progressDialog.isShowing()) {
                     progressDialog.dismiss();
@@ -230,7 +241,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                 Socket client = serverSocket.accept();
                 Log.d(WiFiDirectFragment.TAG, "Server: connection done");
                 final File f = new File(Environment.getExternalStorageDirectory() + "/"
-                        + context.getPackageName() + "/wifip2pshared-" + System.currentTimeMillis()
+                        + context.getPackageName() + "/TDK-" + System.currentTimeMillis()
                         + ".jpg");
 
                 File dirs = new File(f.getParent());
@@ -240,6 +251,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
 
                 Log.d(WiFiDirectFragment.TAG, "server: copying files " + f.toString());
                 InputStream inputstream = client.getInputStream();
+
                 copyFile(inputstream, new FileOutputStream(f));
                 serverSocket.close();
                 return f.getAbsolutePath();
@@ -255,6 +267,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
          */
         @Override
         protected void onPostExecute(String result) {
+            /*
             if (result != null) {
                 statusText.setText("File copied - " + result);
                 Intent intent = new Intent();
@@ -262,7 +275,10 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
                 intent.setDataAndType(Uri.parse("file://" + result), "image/*");
                 context.startActivity(intent);
             }
-
+            */
+            Intent intent = new Intent(context,BitmapActivity.class);
+            intent.putExtra("bitmapPath",result);
+            context.startActivity(intent);
         }
 
         /*
@@ -296,6 +312,7 @@ public class DeviceDetailFragment extends Fragment implements WifiP2pManager.Con
         }
         return true;
     }
+
 
     private byte[] convertByteToStream(Bitmap bmp)
     {

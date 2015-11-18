@@ -36,6 +36,7 @@ public class FileTransferService extends IntentService {
 
     public FileTransferService() {
         super("FileTransferService");
+        Log.e("lefut", "dejoCTOR");
     }
 
     /*
@@ -44,7 +45,7 @@ public class FileTransferService extends IntentService {
      */
     @Override
     protected void onHandleIntent(Intent intent) {
-
+        Log.e("lefut","dejo");
         Context context = getApplicationContext();
         if (intent.getAction().equals(ACTION_SEND_FILE)) {
             //String fileUri = intent.getExtras().getString(EXTRAS_FILE_PATH);

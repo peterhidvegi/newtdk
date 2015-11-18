@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -15,7 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ViewFlipper;
 
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -28,8 +31,9 @@ import de.greenrobot.event.EventBus;
 public class MiddleScreenFragment extends Fragment {
 
     EventBus bus = EventBus.getDefault();
-
+    static EventBus staticBus = EventBus.getDefault();
     Activity mActivity;
+
     IntentFilter filter = new IntentFilter("android.bluetooth.device.action.PAIRING_REQUEST");
     IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 
@@ -37,6 +41,7 @@ public class MiddleScreenFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bus.register(this);
+        staticBus.register(this);
 
     }
 
@@ -119,7 +124,16 @@ public class MiddleScreenFragment extends Fragment {
         for(BluetoothDevice bt : pairedDevices)
             myAdapter.add(new MyBluetoothDevice(bt));
     }
-
+/*
+    public void onEvent(SendBitmapToFrame sendBitmapToFrame)
+    {
+        Log.e("lefut","onEventSendBitMapToFrame");
+       bitmap = sendBitmapToFrame.getBitmap();
+        //viewFlipper.getChildAt(R.id.cameraLayout);
+        viewFlipper.showNext();
+        cameraView.setImageBitmap(bitmap);
+    }
+*/
     @Override
     public void onDestroy() {
         super.onDestroy();
