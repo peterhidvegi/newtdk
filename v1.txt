@@ -1,0 +1,1220 @@
+0
+Számítógép Architektúrák II.
+2015
+2015.12.23.
+A dõltbetûs bordó színnel írt részek, nem képezték az elõadás anyagát. A könnyebb megértés érdekében kiegészítõ jelleggel kerültek bele.
+Készítette:
+Makovics Ákos
+Nagy Enikõ
+Pizág Barnabás
+1
+Tartalom
+1.Elõadás ................................................................................................................................................. 3
+Párhuzamos architektúrák .................................................................................................................. 3
+Párhuzamos architektúrák osztályozása: ............................................................................................ 4
+Utasítás szinten párhuzamos architektúrák ........................................................................................ 5
+ILP processzorok (Instruction level paralel) ........................................................................................ 5
+2.Elõadás ................................................................................................................................................. 6
+VLIW .................................................................................................................................................... 6
+Valós adatfüggõség ............................................................................................................................. 8
+Mûveleti adatfüggõség .................................................................................................................... 8
+Ál-adatfüggõség, WAR- write after read ............................................................................................. 9
+WAW – Write After Write ................................................................................................................... 9
+Ciklusbeli adatfüggõségek ................................................................................................................... 9
+Vezérlés függõségek .......................................................................................................................... 10
+3.Elõadás ............................................................................................................................................... 11
+Utasítás végrehajtás soros konzisztenciája ....................................................................................... 11
+A kivételkezelés konzisztenciája ........................................................................................................ 12
+Idõbeli párhuzamos feldolgozás (futószalag architektúra) ............................................................... 12
+A futószalagok alkalmazási területei ............................................................................................. 13
+Futószalag logikai felépítése .......................................................................................................... 14
+A futószalag megvalósítása ............................................................................................................... 14
+Power PC 604 .................................................................................................................................... 15
+4.Elõadás ............................................................................................................................................... 15
+RISC processzor jellemzõi: ................................................................................................................. 15
+CISC processzor jellemzõi: ................................................................................................................. 16
+Összefoglalás futószalagok ................................................................................................................ 16
+A futószalagos feldolgozás következményei ..................................................................................... 16
+Párhuzamos kibocsátás (szuperskalár CPU-k) I. és II. generáció ....................................................... 17
+Elsõ generációs szuperskalárok (keskeny szuperskalárok) ................................................................ 17
+Harvard architektúra (1944) .............................................................................................................. 18
+5.Elõadás ............................................................................................................................................... 18
+I. generációs szuperskalár ................................................................................................................. 18
+Kibocsátási séma elsõ generációs szuperskalároknál: ...................................................................... 19
+Végrehajtási modell ........................................................................................................................... 19
+2
+Esettanulmány Pentium 1 processzor mûködési modellje ............................................................... 20
+2. Generációs szuperskalárok ............................................................................................................ 22
+Dinamikus becslés ............................................................................................................................. 22
+2 bites dinamikus becslés .................................................................................................................. 22
+Dinamikus üzemezés ......................................................................................................................... 23
+6.Elõadás ............................................................................................................................................... 23
+Regiszter átnevezés „piszkozat regiszter” ......................................................................................... 24
+A II. Generációs szuperskalár RISC CPU végrehajtási modellje ......................................................... 24
+CICS CPU ............................................................................................................................................ 25
+Esettanulmány: .................................................................................................................................. 25
+7. Elõadás............................................................................................................................................... 27
+Utasításon belüli párhuzamosság .................................................................................................. 27
+FP multimédia jelfeldolgozás: ........................................................................................................... 29
+8.Elõadás ............................................................................................................................................... 30
+VLIW architektúra (Very Long Instructon World) .............................................................................. 30
+Esettanulmány IA-64 architektúra Intel itanium (merced) ............................................................... 32
+9. Elõadás............................................................................................................................................... 33
+Netburst architektúra ........................................................................................................................ 35
+Esettanulmány P4 Willemette ........................................................................................................... 35
+10.Elõadás ............................................................................................................................................. 37
+11.heti elõadás ...................................................................................................................................... 40
+Szálszinten párhuzamos architektúrák Hyper Threading logikai modellje: .................................. 40
+Folyamat szinten párhuzamos architektúrák ................................................................................ 40
+Amdahl törvénye: .......................................................................................................................... 41
+Közös memória használatú rendszer: ............................................................................................ 42
+Elosztott memória csomópont ...................................................................................................... 42
+NUMA rendszer két altípusa: ........................................................................................................ 42
+Korlátok: ........................................................................................................................................ 42
+13. Elõadás ............................................................................................................................................ 43
+Gyorsító tárak .................................................................................................................................... 43
+Cache típusok: ................................................................................................................................... 44
+3
+1.Elõadás
+Párhuzamos architektúrák
+- Futószalag
+- Szuperskalár
+1.) Rendelkezésre álló párhuzamosság: A feladatokban rejlõ párhuzamosság.
+2.) Kihasználható párhuzamosság: Végrehajtás során valóban hasznosított párhuzamosság.
+A.) Adatpárhuzamosság
+? Adatpárhuzamos architektúrák
+- Adatelemeken párhuzamos/futószalag elvû mûveletvégzés.
+? Átalakítása funkcionális párhuzamossággá
+- A mûveletek ciklusonként történõ megfogalmazása, ciklus iterációikat hajtunk végre.
+B.) Funkcionális párhuzamosság:
+? Fogalma: A feladat logikájából adódó párhuzamosság esetén
+? A feladat megoldás minden formájában megjelenik kisebb/nagyobb mértékben.
+- A parancsnyelveken írt programok esetén a funkcionális párhuzamosságot különbözõ szinteken értelmezhetjük.
+1. Utasításszintû párhuzamosság ?Program utasítások párhuzamosan történõ végrehajtása.
+2. Ciklusszintû párhuzamosság ? Az egymást követõ iterációk párhuzamos végrehajtása.
+3. Eljárásszintû párhuzamosság ? Párhuzamosan végrehajtott eljárások.
+4. Programszintû párhuzamosság ? Egymástól független programok párhuzamos futtatása.
+5. Felhasználószintû párhuzamosság ? Több felhasználó egyidejû kiszolgálását jelenti.
+- Architektúrák
+- OS-ek
+- Compilerek
+Kihasználható párhuzamosságok (funkcionális):
+1. Az utasításszinten kihasználjuk a rendelkezésre álló párhuzamosságot:
+? Utasításszinten párhuzamos architektúrák (ILP)
+? Erre a célra szolgáló fordítóval
+2. A szálak, és folyamatok
+? A tárgykód legkisebb önállóan végrehajtható egységei ? ezek tehát bizonyos feltételek mellett párhuzamosan végrehajthatók.
+A szálak, és a folyamatok létrehozása történhet:
+? Párhuzamos nyelvet használó programozó által. (fork, join).
+? Több szálas, vagy több feladatos mûködést támogató operációs rendszerrel.
+Törekedtek a rendelkezésre álló párhuzamosság kihasználására.
+4
+? Magas szintû programnyelvek párhuzamos fordítója. (Párhuzamos feldolgozást lehetõvé tevõ fordítóprogrammal)
+3. Ciklus, és eljárás szintû párhuzamosság
+? Szálak/folyamatok formájában vannak jelen
+4. Felhasználói szinten hasznosított párhuzamosság
+C.) Szemcsézettség (Felbontás) Szemcsézettség A kihasználható funkcionális párhuzamosság szintjei
+Finom
+Utasításszint
+Szál szint
+Folyamat szint
+Durva
+Felhasználói szint
+Rendelkezésre álló párhuzamosság Annak kihasználása
+Utasítás szinten
+Utasítás szinten
+Ciklus szinten
+Szál szinten
+Eljárás szinten
+Folyamat szinten
+Felhasználói szinten
+Felhasználói szinten
+Az alacsony szintû párhuzamosság általában közvetlenül.
+Magasabb szintû párhuzamosság többszálas vagy többfeladatos OS-ek alatti konkurens vagy párhuzamos végrehajtással hasznosítható.
+Párhuzamos architektúrák osztályozása:
+Feldolgozó egységek száma alapján:
+1. SI – Egyszeres utasítás folyam (Single Instruction Stream)
+2. MI –Többszörös utasítás folyam (Multiple Instruction Stream) Az architektúra több, egymástól elkülönülõ utasításfolyamat létrehozó vezérlõ egységgel rendelkezik.
+3. SD – Egyszeres adatfolyam (Single Data Stream) a végrehajtó egység egyetlen mûvelet folyamot hajt végre.
+4. MD – Többszörös adatfolyam (Multiple Data Stream) a végrehajtó egységek egymástól független, több mûveletfolyamot hajtanak végre.
+Osztályozás
+SISD SIMD MISD MIMD
+Neumann féle számítógép
+Multimédia feldolgozás
+Elméleti kategória
+Párhuzamos feldolgozás.
+- Nem utal a párhuzamosság fajtájára, szintjére, és kihasználásának a módjára.
+5
+shared- elosztott memória használatú
+distributed- közös memória használatú
+Utasítás szinten párhuzamos architektúrák
+ILP processzorok (Instruction level paralel)
+? Utasítás szinten párhuzamos.
+? Elõd: Neumann CPU, szekvenciális utasítás végrehajtás
+? 1985: idõbeli párhuzamosság elsõ formái: futószalag elvû feldolgozás. ? Igény volt a teljesítménynövekedésre.
+- A Párhuzamos utasítás végrehajtás.
+Futószalag elvû Térbeli többszörözés
+Utasítások több részre bontása.
+Több vezérlõ egység párhuzamos utasítás végrehajtása
+6
+ILP:
+- Cache memóriák
+- Elágazásbecslés
+Kibocsátás:
+1.) Statikusan ütemezett VLIW architektúrák.
+- Compiler oldotta meg a párhuzamosítást.
+2.) Dinamikusan mûködõ szuperskalár architektúrák.
+- Hardver oldja meg a párhuzamosítást.
+I. Generációs szuperskalár:
+? Pufferelés nélküli utasítás kibocsátás.
+- Együtt járt egy fejlett ugrás kezelõ, hatékony memória alrendszerrel.
+- Kibocsátási szûk keresztmetszet.
+Függõségek blokkolják a feldolgozást. ? Megoldás: Utasítás várakoztatás – pufferelés.
+2.Elõadás
+VLIW:
+- 80-as évek: A statikus függõségeket compiler kezelte.
+- 90-es évek: 2. generációs szuperskalárok.
+o A függõségeket hardver kezeli dinamikusan.
+- 1994 MMX:
+o Nincsen függõség.
+o Sok adat van, és ezek mind elõre rendelkezésre állnak.
+- 2000-tõl
+o Evolúciós irány:
+? Feldolgozási sávszélesség 32bitrõl 64bitre nõtt.
+? Logikai architektúra változatlan maradt.
+? AMD X64 utasítás készlet.
+o Revolúciós irány:
+? Teljesen új 64 bites architektúra IA64.
+? Utasításon belüli mûveletek számának többszörözése. (modern VLIW arch.)
+Többmagos CPU
+Teljesítmény növekedés határa.
+7
+Cél: Hardver erõforrások hatékony kihasználása.
+Minden ILP CPU-ra vonatkozó követelmény:
+- Az utasítások végrehajtása során figyelembe kell venni a függõségeket.
+- Meg kell õrizni az utasítás végrehajtás konzisztenciáját.
+ILP CPU-kkal szemben támasztott követelmények:
+D.) Függõségek kezelése:
+a. Futószalag fokozatok
+i. Idõveszteségek
+ii. Függõségek
+Függõségek Csoportosítása
+Adatfüggõségek
+Vezérlés függõség
+Erõforrás függõség
+Egymást követõ utasítások ugyanazt az adatot használják.
+Feltétlen, vagy feltételes ugró utasítások esetén.
+Utasítások ugyanazt az erõforrást (VE)et akarják használni.
+Leghosszabb futószalag: 31 fokozat.
+8
+Valós adatfüggõség
+Mûveleti adatfüggõség
+Van egy CPU-nk 4fokozatú futószalaggal (F, D, D/SO, WB), 3operandusos utasítással.
+Következmény: Csökken a hatékonyság.
+Teljesen nem kiküszöbölhetõ, viszont a káros hatása csökkenthetõ.
+Kezelése:
+E.) Operandus elõrehozással
+F.) Extra hardverrel dinamikusan.
+CPU érzékeli, hogy szükség lesz még az adatra. Ha igen, ne csak az r3 –ba töltsük vissza, hanem az ALU –ba is.
+Általános forma: Mûveleti valós adatfüggõség kezelése Behívási valós adatfüggõség kezelése
+Mivel az r3-ban a szorzat meg nem állt elõ, ezért a másik utasítás várakozni kényszerül.
+9
+Ál-adatfüggõség, WAR- write after read
+A.) Probléma
+( Szorzásnál:)
+- szekvenciális feldolgozás ? nincsen gond
+- párhuzamos feldolgozás:
+o Elõfordulhat az I2 utasítás hamarabb fut le, mint az I1 ? az add utasítás felülírhatja a mul utasítás bemenõ operandusát.
+A két utasítás között függõség áll fenn.
+B.) Megoldás: Megszüntethetõ regiszter átnevezéssel
+r2 ? r27 átmeneti regiszter önálló, saját címtartománnyal.
+I1 mul r3r2r1
+I2 add r27r4r5
+Extra HW átnevezési regiszterkészletet építettek be. Architektúrális regiszterkészlet.
+Az I2 utasításban szereplõ cél operandust egy egészen más regiszterbe helyezzük (átmeneti regisztertérbe) ? a két utasítás függetlenné vált.
+WAW – Write After Write
+A.) Probléma
+- Mindkét utasítás ugyan abba a regiszterbe ír.
+- Párhuzamos feldolgozásnál az I2 utasítás hamarabb írhat az r3-
+as regiszterbe, ami hibát eredményezhet.
+B.) Megoldás: átnevezési regiszterkészlet bevezetése. (történhet statikusan és dinamikusan is)
+I1 mul r3r2r1
+I2 add r31r4r5
+Ciklusbeli adatfüggõségek
+A.) probléma:
+Valós függõség, az X I. eleme értékének meghatározásához szükségünk van az X I-1. elemének értékére, ami párhuzamos feldolgozás esetén még nincs kész.
+A lassítás mértéke függ attól, hogy az X-nek melyik indexû értékére van szükség. A példában a leginkább lassító eset szerepel, kevésbé lassít pl. az I-2 vagy I-3 stb.
+B.) Kezelése: Algoritmus átalakítással.
+I1 mul r3r2r1
+I2 add r2r4r5
+Mit tehetünk, hogy ne írja felül a
+következõ operandus az elõzõt?
+MUL sokkal lassabb, ADD megelõzi!!
+I1 mul r3r2r1
+I2 add r3r4r5
+do I=2,n
+X(I):=A(I)*X(I-1)+B(I)
+end do
+10
+Vezérlés függõségek
+Feltétlen elágazás, késleltetett ugrás, statikus elágazás kezelés.
+A.) Probléma
+Az I3 (sub) utasítása
+- Egyrészt felesleges.
+- Másrészt regiszter tartalmat veszélyeztet.
+Mivel a JMP hatására feltétlen ugrás következik be, nem a SUB hanem az SHL a következõ. A SUB utasítás nem hajtódik végre.
+B.) Kezelni tudjuk: statikusan, dinamikusan, spekulatív módon.
+Statikus kezelés:
+- NOP utasítás a futószalag számától függõen (JMP után tesszük be).
+- Ez az ugrási rés, vagy buborék.
+o 1. Kétfokozatú futószalagnál: 2-1=1
+o 2. Négyfokozatú futószalagnál 4-1=3
+o 3. N-fokozatú futószalagnál n-1
+Lényege: Fölösleges utasításokat végzünk, de nem veszélyeztetjük a regiszter tartalmakat.
+Kétfokozatú futószalag esetén. Minden JMP utasítás után beszúr egy NOP –ot
+MUL
+JMP címke
+NOP
+ADD
+Címke SHL
+Dinamikus/optimalizáló kezelés:
+- A compiler megpróbálja megváltoztatni az utasítások sorrendjét.
+- Az ugró utasítás elõttrõl áttesz 1, vagy több adatmanipuláló utasítást a JMP utasítás mögé.
+Értékelése: Feltöltés valószínûsége
+2 Fokozatú futószalag esetén:
+~85%
+3 Fokozatú futószalag esetén:
+~50%
+I1 mul
+I2 jmp címke
+I3 sub
+.
+.
+.
+címke shl
+I1 mul
+I2 jmp címke
+I3 sub
+11
+div r3 r2 r1
+add r6 r4 r5
+jz címke
+3.Elõadás
+A feltételes ugrások vezérlés, függõsége:
+? Ma már csak dinamikusan.
+o Elágazásbecslés.
+o Spekulatív elágazás kezelés/ becslés.
+Erõforrás függõsek:
+Többszörözéssel:
+FX, FP, L/S (load/store), B (branch), MMX (multimédiás) végrehajtó egységek lehetnek.
+A szekvenciális konzisztenciák megõrzése:
+- Gondoskodni kell a program logikai integritásának megõrzésérõl.
+Utasítás végrehajtás soros konzisztenciája
+A.) Probléma
+Párhuzamos feldolgozás esetén elõfordulhat, hogy a div utasítás fejezõdik be késõbb, és annak eredménye alapján történhet az ugrás. Gondoskodni kell a program logikai integritásainak megõrzésérõl. Megsérti a soros végrehajtás logikáját -> pontatlan kivételkezelés. Az ugrásutasításnak meg kell várnia, hogy a div és az add is befejezõdjön.
+Szekvenciális végrehajtás:
+Elõször a DIV, aztán az ADD, hajtódik végre és a címkére ugrás pedig akkor következik
+be, ha az ADD eredménye 0.
+Párhuzamos feldolgozás:
+A DIV utasítás fejezõdik be késõbb, tehát biztosítani kell, hogy a címkére ugrás csak
+akkor következzen be, ha az ADD eredménye 0.
+12
+A kivételkezelés konzisztenciája
+Ha megszakítást a CPU azonnal fogadja, elõfordulhat, hogy a soros végrehajtástól eltérõ sorrend alakul ki. A CPU pontatlan megszakításkezelést végez.
+Tegyük fel, hogy az ADD, mûvelet túlcsordul ?megszakítás, az elsõ utasítás definiálatlan állapotba kerül, ha a megszakítást rögtön elfogadja a CPU. Az add utasítás 16-bites integer formátumú, a következõ értékkel 15000+25000 = megszakítás (túlcsordulás miatt)
+Kezelése:
+1. Pontatlan kivételkezelés gyenge konzisztencia.
+? Mihelyt bekövetkezik a megszakítás, az azonnal elfogadja.
+? Ebben az esetben az ADD okozta megszakítás elfogadása után a MUL utasítás definiálatlan állapotba kerül.
+2. Pontos kivételkezelés
+? Erõs konzisztencia.
+? Megszakítás kizárólag az utasítások eredeti sorrendjében fogadja el.
+? Megvalósítása:
+? Átrendezõ pufferrel (ROB - ReOrder Buffer) Intel (A processzor csak akkor fogadja el a megszakításkérést, amikor az adott utasítást kiírjuk az átrendezõ-pufferbõl.)
+? Címkézéssel: sorszámot kapnak az utasítások.
+Idõbeli párhuzamos feldolgozás (futószalag architektúra)
+Elméletileg 2x-es gyorsítás értjetõ el vele. (2 fokozat esetén, 3 fokozat esetén 3x-os)
+Kellõen nagyszámú utasítás esetén két fokozat mellett elvben megdupláztuk a feldolgozási sebességet. Ezt a függõségek meggátolják a gyakorlatban.
+mul r3 r2 r1
+add r6 rr4 r5
+jz
+??=????
+N: futószalag fokozatok száma.
+13
+Futószalag feldolgozás elõfeltételei (2 fokozat esetén)
+? A számítógép (CPU) két egymástól független hardver egységgel rendelkezzen 1 fokozat, 2 fokozat.
+? Mindkét fokozat pontosan ugyanannyi idõt igényel
+? Az egyik fokozat kimenete a másik fokozat bemenete
+? A fokozatok szinkronizáltak, órajelre mûködnek.
+? Mindkét fokozat órajelre fogadja az inputot és egyetlen óraciklus alatt elvégzi a kívánt mûveletet
+? Órajelenként 2 utasítást tud értelmezni
+Futószalag fokozatok sorrendjének meghatározása:
+Újrafeldolgozás:
+? A futószalag sebessége lecsökken.
+? Általában szorzás, osztás esetén.
+A fixpontos szorzás/osztásnál igen hosszú lenne, ha a részeredményeket mûveletenként kimentenénk a regiszterekbe. Helyette a részeredményeket az E fokozat végérõl visszavezetik az E fokozat bemenetére.
+? FX, FP futószalagok is használják.
+A futószalagok alkalmazási területei
+1. Overlapping (Elõ lehívás):
+? 1 Óraciklus spórolás.
+Az elõzõ utasítás visszaírási fázisát és az aktuális utasítás lehívási fázisát párhuzamosítjuk. Elvben maximum 1 óraciklus nyereség utasításonként, ezt a függõségek mérséklik
+2. Vektor CPU:
+Csak a végrehajtó egységek mûködnek futószalag szerûen. Végrehajtási fázisok átfedése.
+3. A teljes utasítás – feldolgozási folyamat futószalag elvû megvalósítása:
+Elvben óraciklusonként tudunk utasítást lehívni.
+14
+Futószalag logikai felépítése
+Cél: funkcionális kialakítás. Minden utasítás kategóriában célszerû kialakítani egy futószalagot: FX (egyszerû/összetett), FP, L/S, B (ugrási branch), MMX.
+Aritmetikai
+Branch
+Ugrási futószalag:
+Elsõ szint: A futószalagok funkcionális kialakítása
+Második szint: Egyes fokozatok által végrehajtandó elemi mûveletek specifikálása
+A futószalag megvalósítása
+Fizikai megvalósítás (Implementáció)
+? 60-as 80-as évek
+Elválasztó regiszter = rejtett regiszter = kosárka
+Szuperskalárok:
+Cél:
+- Több dedikált futószalagos kialakítás
+- Univerzális futószalag
+F
+D/SO
+E
+WB
+F
+E
+15
+Power PC 604
+4.Elõadás
+Párhuzamos utasítás kibocsátás:
+Egyes fokozatok hossza eltérõ lehet
+8046 Pentium – 2 utasítás futószalag:
+- dedikált
+- univerzális
+RISC processzor jellemzõi:
+Csökkentett utasítás, és címzési mód készletû architektúra. (50-150 utasítás)
+Jellemzõi:
+? minden mûveletvégzõ utasítás regisztereket használ
+? operatív tár elérése csak a LOAD/STORE utasításokkal lehetséges
+? 3 operandusos utasítások (r, r, r)
+? Nagyszámú általános regiszterrel rendelkezik
+? minden utasítás ugyanolyan hosszú
+? bonyolult fordító programmal rendelkezik
+? utasítás dekódolás általában huzalozott (hardveres)
+? az utasításokat lehetõleg 1 órajel ciklus alatt hajtja végre
+Hátrány: bonyolult utasítások: instrukció – szekvenciákkal ? nõhet a program mérete
+Elõny: gyors
+16
+CISC processzor jellemzõi:
+? Jellemzõen 2 operandusos utasítások.
+? A második operandus lehet memória is.
+? Nagyszámú utasításkészlet (akár több száz).
+? Egy utasítással több elemi feladat megvalósítható.
+? Nagy mikroprogam tár.
+? Változó méretû utasítás hossz (1 -60 byte típustól függõen).
+? Közvetlen memóriaelérés is lehetséges.
+? Sokféle címzési mód.
+? Az utasítások feldolgozása általában több ciklust vesz igénybe.
+? Egyszerûbb a gép kódú programozás a nagyszámú utasítások miatt.
+Elõny: kompatibilitás
+Késõbb (ma már) RISC mag beépítése CISC processzorokba a gyakori mûveletek gyorsítására.
+CISC:
+- memória operandusok kezeléséhez további futószalag fokozatok beépítésére volt szükség. Emiatt +2 fokozat: címszámítás, CACHE elérés
+Trend: fokozatok száma nõtt -> ciklusidõ csökken -> frekvencia növelhetõ
+Összefoglalás futószalagok
+Jelentõsen növelhetõ lett a lehívott utasítások száma
+Abszolút határ (idõbeli párhuzamosság esetén) ?1 utasítás /óraciklus
+További teljesítménynövelés csak más dimenziókban lehetséges
+? Kibocsátási párhuzamosság ? szuperskalár.
+? Utasításon belüli párhuzamosság ?multimédiás feldolgozás.
+A futószalagos feldolgozás következményei:
+Probléma:
+Sebesség növekedést operatív tár nem bírta -> kinyílt a sebesség olló
+? nagyobb sávszélesség
+? vezérlés átadási utasítások kifinomult technikájára
+Kezelés: gyorsító tárak bevezetésen (80-as évek)
+? elágazás-kezelés (ugrási buborék) módjai: 4 késleltetett ugrás 1 korai RISC
+a) feltétlen elágazás n-1
+b) feltételes elágazás +2 órajel ciklus (feltétel kiértékelés és az ugrási cím kiszámítása)
+? elágazás kezelés ugrási buborék -> késleltetett ugrás
+o CISC CPU-knál beépítették a dekódolási egységbe a címszámító és a komparáló áramköröket (korai CISC) => a dekódolási ciklus végére elõáll az ugrási cím
+o késõbbi CISC fix elõrejelzés (80486)
+? feltételezi, hogy mindig ugrik
+? elkezdi az utasítás végrehajtását a megbecsült irányban
+? kiküszöböli a kibocsátási blokkolást
+17
+Feloldatlan feltételes utasítások
+Nagy látenciával (késleltetéssel) rendelkeznek.
+Ez blokkolja a kibocsátást még az 1. generációs szuperskalároknál is.
+Kezelés: spekulatív elágazásbecsléssel.
+Párhuzamos kibocsátás (szuperskalár CPU-k) I. és II. generáció
+Közös jellemzõi:
+1) Kibocsátási párhuzamossága CPU a dekódoló egységbõl képes óraciklusonként több utasítást kibocsátani. Kibocsátási ráta (2 – 6) MAX
+Mûködési elv:
+- A függõségekkel maguk birkóznak meg dinamikusan. (extra hardver)
+- Kompatibilitás (pld x86 architektúra) evolúciós fejlõdés.
+Elsõ generációs szuperskalárok (keskeny szuperskalárok)
+(Kibocsátási szûk keresztmetszet)
+? RISC CPU estén MAX 2-3 utasítás / ciklus
+? CISC CPU esetén MAX 2 utasítás /ciklus
+Jellemzõi:
+? Nem pufferelt (közvetlen) utasítás kibocsátás
+? Statikus elágazásbecslés (ezt a lehívási FETCH alrendszer végzi)
+a > 0 ugrik
+a >= 0 ugrik
+a < 0 folytatja sorrendben
+a != 0 folytatja sorrendben
+? Gyorsító tárak: 2 szintû
+o L1 -CPU lapkán
+? adat gyorsító tár
+? utasítás gyorsító tár
+o L2 – külön lapkán
+? 2-3 végrehajtó egységgel rendelkezett
+a = x / y
+if a <10
+18
+Harvard architektúra (1944)
+Lényege: A programkód és az adatok fizikailag elkülönített útvonalon mozognak.
+Párhuzamos adat utak => teljesítménynövekedés
+Manapság módosított Harvard architektúrát alkalmaznak.
+- Külön címtartományok, különbözõ hosszúságúak.
+5.Elõadás
+I. generációs szuperskalár
+- Közvetlen nem pufferelt kibocsátás utasítás kibocsátás. (dekódolás után egybõl küldi a VE-nek az utasítást)
+Utasítás ablak: olyan puffer, amely az adott ciklusban kibocsátandó utasításokat tartalmazza. Itt történik a dekódolás és a függõség ellenõrzés is. Független utasítások szabad VE -khez kerülnek.
+Mûködési alternatívák:
+? Utasítás ablak feltöltése történhet:
+o utasításonként
+o egyszerre az összes (amikor az utasítás ablak kiürül)
+? Utasítások feldolgozása történhet:
+o sorrendben
+o sorrenden kívül
+Kezdetben az utasítások feldolgozása sorrendben, az utasításablak feltöltése egyszerre történt.
+19
+Kibocsátási séma elsõ generációs szuperskalároknál:
+Kibocsátjuk a független i1 utasítást.
+Utasítás feldolgozás sorrendben történik. Ezért mivel a második utasítás nem hajtható végre, valamilyen függõségre vár, ezért a harmadik utasítás sem fog végrehajtódni.
+A következõ óraciklusban az i2 utasítás függõsége már feloldódott, ezért
+kibocsátható mind az i2, mind pedig az i3.
+Ezzel az utasításablak kiürült.
+Feltöltjük a kiürült utasításablakot 3 további utasítással.
+Közülük az i4 és az i5 független, ezért kibocsátjuk, míg az i6 a függõségek feloldásáig vár a kibocsátásra.
+I6 utasítás kibocsátásra kerül.
+Utasításablakot feltöltjük. I7 feloldása után nincs függõség.
+0 db kibocsátott utasítás
+Összes kibocsátása (nincs függõség)
+Végrehajtási modell
+A legkisebb átbocsájtási képességgel rendelkezõ alrendszer határozza meg az egész rendszer átbocsájtási tényezõjét.
+Egyszerûsített mûködési modell (RISC)
+A rendszer 3 részbõl áll:
+1.) elsõ rész
+o feladata: utasítás lehívás, utasítás ablak feltöltése
+2.) hátsó rész
+o feladata: dekódolás, függõség ellenõrzés, kibocsátás, végrehajtás, visszaírás
+3.) utasítás ablak (összeköti a két részt)
+Az operandusok archiktetúrális regiszterbõl kerülnek betöltésre.
+20
+Keskeny szuperskalárnak is nevezik:
+Szélesség: hány utasítást képes feldolgozni ciklusonként. -> A teljes rendszer átbocsájtó képességét a legkisebb átbocsájtó képességgel rendelkezõ alrendszer fogja meghatározni.
+? Kibocsátási szûk keresztmetszet
+Kiküszöbölt, csökkentett függõségek:
+? Memória függõséget csökkentve
+? Elõrejelzés késleltetésének csökkentve
+? Erõforrás függõség csökkentve
+? Adatfüggõséget nem tudtuk csökkenteni!
+o mind a valós mind az álfüggõség blokkolt
+Általános célú alkalmazásoknál a rendelkezésre álló utasítások száma kb. 2 db/ciklus, a kibocsátási szûk keresztmetszet miatt ennyire korlátozódott.
+Kibocsátás: RISC 2-3 utasítás/ciklus, CISC 2 utasítás/ciklus.
+Esettanulmány Pentium 1 processzor mûködési modellje
+? 2 futószalaggal rendelkezett.
+? 1 db V futószalag (dedikált) FX egyszerû LIS, branch utasítások elvégzése
+? 1 db U futószalag (univerzális/master) minden más mûvelet elvégzésére alkalmas volt
+Ennek kiegészítése volt egy 3 fokozatos FP (lebegõpontos) futószalag
+(RISC CPU 2-4 db dedikált futószalag)
+21
+A futószalagok 5 fokozatúak
+F
+D
+AG
+E
+W/B
+F – fetch - lehívás, D – decode, AG - címszámítás, E – execute, W/B write back- visszaívrás
+Újdonság:
+- belül 64 bites busz
+- kívül 32 bites ? két ciklus alatt töltötte fel a belsõ buszt
+Újdonság: branch prediction - ugrás elõrejelzés, ehhez 2 db prefetch puffer
+2 db egyenként 8 kbyte belsõ cache:
+- Egy a programkódnak.
+- Egy az operandusoknak.
+-
+22
+2. Generációs szuperskalárok
+a) Feltétel:
+o Dinamikus utasítás ütemezés.
+o Regiszter átszervezés révén kiküszöböli az álfüggõségeket ? ez által a kibocsátási szûk keresztmetszetet.
+b) Feltétel
+o Elágazások kezelése dinamikusan történik.
+o Dinamikus elõrejelzés (spekulatív becslés) 90 – 95% pontossággal.
+c) Feltétel
+o Kifinomult és kibõvített gyorsító tár alrendszer.
+d) Sorrendben kívüli betöltés.
+Teljesítmény:
+- RISC kb. 4 utasítás/ciklus
+- CISC kb. 3 utasítás /ciklus
+Dinamikus becslés
+Az egyes elágazások történetét a CPU történetbitek formájában írják le.
+Fajtái:
+? 1 bites: 1 mélységben vizsgálja az utasításokat: 1 bit azt jelzi, hogy az adott elágazás a legutolsó végrehajtáskor bekövetkezett vagy sem.
+? 2 bites
+? 3 bites
+2 bites dinamikus becslés
+4 állapotú véges automata. A CPU 4 állapotot tart nyilván az elágazásokhoz. Minden elágazáshoz külön!) Fajtái:
+? 00 határozott soros folytatás
+? 01 gyenge soros folytatás
+? 10 gyenge elágazás
+? 11 határozott elágazás
+A kezdõ állapot 11
+23
+Dinamikus üzemezés
+- Más néven várakoztatás vagy pufferelt utasítás kibocsátás
+- Várakoztató állomás
+Lényege:
+? pufferelt utasítás kibocsátás
+? sorrenden kívüli utasítás ütemezés
+Elve (RISC)
+- F, D Issue – kibocsátás nominális rátával mûködhet mivel nincs függõség vizsgálat!
+- Az adatok/utasítások kiküldése a VE-ek felé sorrenden kívül történik.
+3 út/ciklus tudja feltölteni a várakoztató állomásokat
+6.Elõadás
+- Az utasításablak magába foglalja a teljes várakoztató állomást. Ez az egész ellenõrzésre kerül végrehajthatóság szempontjából.
+- 4 utasítás / ciklus RISC
+- 3 utasítás / ciklus CISC
+.
+24
+Regiszter átnevezés „piszkozat regiszter”
+Cél: ál-adatfüggõségek kiküszöbölés WAR WAW
+A CPU minden célregiszterhez allokál egy átnevezési regisztert.
+? Megnövekszik a független utasítások száma. Mert nem az architektúrális regiszterben tárol.
+Átnevezési logika (+ HW ) átnevezi a forrás regisztereket is.
+Kell egy átnevezési logika, ezt egy plusz hardver beépítésével tudták megoldani a mérnökök. Ez átnevezi a forrásregisztereket is annak érdekében, hogy biztosítsa az operandusnak a megfelelõ helyrõl való beolvasást. Hogyha megszûnik a függõség, akkor az eredményeket visszaírja az architektúrális regiszter megfelelõ helyére. A piszkozat regiszterben végzi el a mûveleteket => nem veszélyezteti a regiszter tartalmakat a hibás becslés.
+A II. Generációs szuperskalár RISC CPU végrehajtási modellje
+- Tipikusan 4 utasítás széles
+Állapot bitek:
+0: Operandus nem áll rendelkezésre.
+1: Az operandus rendelkezésre áll, és kiküldhetõ.
+25
+CICS CPU
+Nóvum : CISC utasításokat átkonvertálják RISC szerû utasításokká.
+Átlagosan egy CISC utasítás megközelítõleg átlagosan 1,2-1,5 RISC utasításnak felel meg.
+II. generáció összefoglalás:
+? VEZÉRLÉS FÜGGÕSÉGEK
+o Dinamikus utasítás kezeléssel és
+o Spekulatív elágazás kezeléssel
+o Sorenden kívül kiküldéssel
+? Erõsforrás függõségek vezérlõ egységek többszörözésével KEZELVE
+? Áladat függõségek regiszter átnevezéssel MEGOLDVA
+? Való adat függõségek (RAW) – Blokkol, részben kicsit kezeljük a spekulatív elágazás kezeléssel
+Mikor történik a végrehajtás?
+- Amikor a bemenõ operandusai rendelkezésre állnak!
+- Adatvezérelt végrehajtás (STRÉBER modell)
+Esettanulmány:
+Pentium Pro 1995 – 133MHz (CISC processzor -> CISC megette a RISCeket haha)
+FX futószalag 14 fokozatú (RISC futószalag)
+Központi várakoztató állomás: 20 bejegyzés.
+A szigorúan soros konzisztenciát a ROB biztosította.
+A ROB végezte a regiszter átnevezést is.
+1) Lehívás
+128 bites blokkokban ? utasítás cache
+Elõször azokat az utasítás részleteket az utasítás határra kell illeszteni.
+2) Dekódolás, átalakítás
+- Ciklusonként maximum 3 utasítás dekódolása RISC-szerû mûveletekké
+- D1: legfeljebb 4 RISC utasítássá alakítja át a cisc utasításokat
+- D2, D3: egyszerû dekódolók -> egy CISC utasítást egy RISC utasítássá tudja átalakítani (pl.:+, -)
+- MIS dekódoló: 4-nél több RISC-szerû utasítássá dekódol
+Minden létrehozott RISC utasítás azonos hosszúságú, azonos formátumú és 128 bites
+A RISC szerû utasítások egy várakoztató sorba kerülnek, ami hat bejegyzéses.
+Sebesség Max. 6 RICS utasítás/ciklus
+Kezelve
+26
+Ha az átnevezési regiszter azonosítóhoz:
+? még nem állt elõ az eredmény a forrás operandus, akkor a CPU a regiszterazonosítót írja be a várakoztató állomáson levõ utasítás operandus mezõjébe, és az állapot bitjét 0-ra állítja.
+3 operandusos RISC utasítás. r3 ? r2@r1
+? tartozik ROB bejegyzés, akkor a CPU a ROB bejegyzést-tartalmát részesíti elõnyben az architektúrális regiszter tartalmához képest! Valamint ennek tartalmát írja be a várakoztató állomásban található utasítás
+operandus mezõjébe. -> az állapotbit értékét 1-re állítja
+A CPU csak az állapotbiteket vizsgálja.
+Kiküldés: sorrendben kívüli kiküldés, több független utasítás esetén az idõsebbet részesíti elõnyben.
+Visszahívás:
+? ROB - szekvenciális konzisztenciát biztosít
+? várakoztató állomásba
+ROB frissítése 2 célt szolgál
+? a következõ utasítás felhasználhassa az
+eredményt
+? szekvenciális konzisztencia megõrzése
+A regiszterek átnevezési sorrendben vannak
+27
+7. Elõadás
+Kiíratási szabályok:
+? Csak akkor írható ki, ha minden õt megelõzõ utasítás már kiírásra került.
+? CICS utasításhoz RISC utasítás csak egyszerre írhatóak ki. Risc-Cisc konverzió.
+? Spekulatív állapotban lévõ utasítások nem írható ki. Kiírás után a ROB regisztereket felszabadítja a hardver.
+Kiíratás várakoztató állomásba:
+Utasításon belüli párhuzamosság
+Harmadik generációs szuperskalárok MM/3D kiterjesztéssel
+Tervezési tere:
+Duális mûveletes utasítások
+SIMD
+VLIW
+Példák utasításokra:
+? ?? = ?? * ?? + ??
+? load op + exec utasítás
+2 típus: FX és FP
+Logikai architektúra kiterjesztése
+2 típus: Széles (vagy hosszú) és keskeny
+Teljesen új processzor szintû logikai architektúra kell
+Evolúciós irány
+Revolúciós irány
+SIMD:
+Egyetlen utasításon belül több operandussal ugyan azt a mûveletet hatjuk végre.
+Jellemzõi:
+? Logikai architektúra (ISA) kiterjesztése (új utasítások)
+? Nagyobb memória sávszélesség ? L2 cache a processzor lapkára kerül
+? Megjelent a nagyobb sávszélességet biztosító grafikus busz (AGP)
+FX SIMD utasítások:
+- Hang és pixeles multimédiaalkalmazások.
+- 2-8 operandus.
+- FP SIMD utasítások: vektoros és 3D Képfeldolgozásban gyorsítanak. 2-4 FP operandus.
+28
+Hanghullámok: (audio digitalizálás)
+- AD konverter. Például 8 bit: 256 érték általában 16-24 biten.
+- Mintavételezés gyakorisága pl. 50 KHz.
+Mintavételi példa: Alkalmazás Mintavétel (kHz)
+Digitális telefon
+8
+CD
+44,1
+DVD egyszerû
+48
+DVD minõségi
+96
+Fontos a feldolgozási sebesség, költségtényezõ (FX olcsóbb).
+A felbontás, és a mintavételezés határozza meg a létrejövõ adatmennyiséget.
+Sztereó: 2 független információ, dupla adatmennyiség.
+Pl.: CD: 44 KHz, 150000 bit/s, percenként 9-10 Mbyte.
+A tárolástömörítéssel kezelhetõ.
+Képfeldolgozás (FX):
+Kép: fények, színek, és árnyékok variációja.
+A kép feldolgozása során képpontokra bontjuk a képet, és minden pontnak megmérjük a színét, és a fényességét.
+Színskálát kódoljuk:
+? 1 bit
+? 16 bit (64k szín, high color)
+? 24 bit (224K szín, true color)
+? 32 bit (3D-hez, 24 bit + 8 bit alfa csatorna) pl. át látszósági mutató
+Feladat, vagy probléma:
+? Nagy mennyiségû adat tárolása, feldolgozása.
+Arcitektúrális megoldás:
+? Multimédia kártya.
+? CPU multimédiás bõvítése.
+29
+Multimédiás CPU tipikus mûveletei:
+? Bit blokk átvitel.
+? Ablakkezelés (minden megnyitott ablak 1-1 bit blokként kezel a gép)
+? Pl. 1280x1024-es 16 bites kép kb. 2,5 MB memória FX adatot feltételez.
+64 bites pakolt adattípus: Fix Pontos Hossz Teljes hossz
+Pakolt byte
+8 bit
+64 bit
+Félszó
+4 bit
+64 bit
+Szó
+2 bit
+64 bit
+MM utasítások:
+? 4 alapmûvelet
+? Logikai mûveletek
+Fizikai architektúra:
+? 64 bites belsõ busz
+? Regiszterei:
+o FP regiszterek (80 bit)
+(Pentium II-ben 2 db MMX futószalag volt.)
+Minden adat elõre rendelkezésre áll, a gyorsítás valós, és érzékelhetõ. (Nincs függõség kezelés, nem fékez.)
+FP multimédia jelfeldolgozás:
+Vektoros képfeldolgozás.
+Egyenesekkel, és görbékkel határolt objektumok geometriai jellemzõkkel leírhatók.
+Egy képet sokszögek sokaságára lehet felbontani: ~20 000 sokszög.
+A számítógép a geometriai alakzatokat tárolja, és ezzel számol.
+Miért kell FP?
+- Megfelelõ pontosság biztosításához.
+- Kevesebb, de még mindig sok adatot tárolunk, és azokon nagy mennyiségû bonyolult számításokat hajtunk végre.
+Textúrák: Objektumok közötti éles határokat elmossák.
+2D-s ábrázolás:
+? Textúrák: fény és árnyékhatások, éles határok elmosása.
+30
+3D-s ábrázolás:
+? Térhatás érdekében 3. dimenzió használata.
+? Biztosítjuk, hogy a párhuzamosak a végtelenben összetartanak.
+? A közelebbi objektumok nagyobbak legyenek, a távolabbiak kisebbek.
+? Atmoszférikus hatás. (Minél távolabb van valami, annál kékebb, és homályosabb)
+8.Elõadás
+3D- filmfeldolgozás:
+Min 15 kép/sec általában 20-30 frame/sec
+- Egy kép kb. 20-30 ezer sokszögbõl áll ~500 00 sokszög/sec
+1998 Intel P3 (SSE utasítás készlet)
+- 2GFLOPS ? 2 milliárd lebegõpontos mûvelet/másodperc
+SSE:
+- 70db új utasítást tartalmazott
+- 128 bites szó hossz:
+o 4x32 bit egyszeres pontosság
+o 2x64 bit kétszeres pontosság
+(IEEE FP szabvány szerint)
+VLIW architektúra (Very Long Instructon World)
+Jellemzõi:
+1.) Térbeli és idõbeli párhuzamosítás
+2.) Függõségek kezelése Compiler által szoftveren
+3.) Új utasítás forma:
+? több utasítást tartalmazó utasításszó (függõségektõl mentes)
+Elõfeltételei:
+- függõségek kezelése
+- utasítások hatékony ütemezése
+Utasításmezõ: 1-1 mezõ, 1-1-VE-et vezérel
+Fejlõdése:
+1. Korai vagy, széles VLIW
+2. Keskeny VLIW
+Utasításszó:
+- 256-1024 bit
+- 7-28 utasítás
+31
+Elõnyei:
+? Ugyanolyan fokú párhuzamosság esetén jóval egyszerûbb felépítés.
+? Ugyanolyan komplexitás esetén nagyobb feldolgozási szélesség.
+Hátrány:
+? Compiler (statikus ütemezés) az õ felelõssége minden függõségtípus kezelése a Compilernek pontosan kell ismernie a fizikai architektúrát:
+? VE –egységek típusát és számát
+? VE ismétlési és betöltési idejét
+? a gyorsító tárak beöltési idejét
+? a gyorsító tárak késleltetését stb.
+? A compilertõl elvárt, hogy agresszív párhuzamosítást hajtson végre, hogy ciklusonként elegendõ párhuzamosan végrehajtható utasítást találjon.
+Hátrány:
+? Forradalmian új architektúra
+? Teljesen új utasításkészlet architektúra: ISA
+Széles VLIW: 10-20 VE
+Keskeny VLIW: 4-8 VE
+? utasításszó kb. 100 bit
+? digitális jelfeldolgozás
+? utasításszó: 4 -8 mûveletet tartalmazott
+Alkalmazási területek:
+? Digitális jelfeldolgozás, multimédia
+? Szerver rendszerek
+? Notbook (Transmeta) – kevésbé energiaigényes
+Keskeny VLIW-ek jellemzõi:
+? Fordítási idõben történõ ütemezés
+? a CPU egyszerûbb, viszont több hely van a regiszterek és a VE-ek számára, valamint a CACHE-nek.
+EPIC: (a VLIW -hez hasonlók, csak itt kifejezetten párhuzamos végrehajtás) (Intel-HP elnevezés)
+o cél: a lehetõ legtöbb utasítás fusson párhuzamosan, még ha ezek egy része feleslegesen is fut le.
+o CPU sebesség nõtt, a memória kisebb mértékben.
+o fordítási idõben történõ ütemezés lehetõséget ad a spekulatív adatbetöltésre pld.: LOAD és USE (adat megjelenése) közé más független utasításokat tud betölteni (optimalizáló Compiler! )
+idõ, és pénz
+32
+Esettanulmány IA-64 architektúra Intel itanium (merced)
+Mit határoz meg az ISA (utasítás készlet architektúra)
+? utasításokat
+? adatformátumokat (adattípus)
+? regisztereket
+? címzési módot
+? memória modell (memória felépítés)
+? megszakítást és a csapdakezelést
+? I/O kapcsolatok kezelését
+? kompatibilitás más ISA-kal
+Ezt mind figyelembe kell venni ezért olyan bonyolult a dolog
+Egy teljesen új rendszerben gondolkodtak, ami nem kompatibilis az x86-tal
+Merced CPU
+? 64 bites, regiszterekben gazdag architektúra
+? szószélesség 64 bit és bájtonként címezhetõ
+? mindent a Complier vezérel ? többletbitek segítségével (ahogy ez egy VLIW architektúránál elvárható)
+? utasításszó 128 bit (két szó)
+? 128 db általános célú regiszter 64 bitesek
+? 128 db FP regiszter 82 bitesek
+? 64 db predikátum regiszter 1 bites regiszterek
+? 8 db ugrási/branch regiszter
+? 4 féle végrehajtó egység típus:
+o I: integer unit
+o M: LOAD/STORE mûveletekhez
+o B: branch elõrejelzés és ugrás mûveletekhez
+o F: lebegõpontos mûveletekhez
+Logikai architektúrája az IA 64-nek
+? Utasításszó 128 bit 3 utasításból és template mezõbõl áll (Template mezõ: mely utasítások hajthatók végre párhuzamosan)
+? A lehívási ráta L1 Cache-bõl 2 utasítás szó /ciklus.
+? Template mezõ: értelmezése nem csak egyetlen utasításra vonatkozik.
+? Az utasításszóba bekerülhetnek független és függõ utasítások is.
+Template mezõ
+? Ez határozza meg, az utasításnak az adat VE-hez történõ hozzárendelését
+? A mezõ jelzi a STOP-ok meglétét.
+o A STOP elõtti 1 v. több utasításnak erõforrás függése van a stop utáni 1 –vagy több utasítással
+33
+Tulajdonságok (intel itanium):
+Hardveresen támogatja:
+? Elõre jelzett végrehajtást (predicted execution)
+? Vezérlési elõrejelzést (control speculation)
+? Adat elõrejelzést (data speculation)
+? Szoftver futószalagot
+? Egy feltételes elágazás mindkét végét végrehajtja (predikátum regiszter)
+? A hivatkozás csak akkor érvényesíthetõ, ha a predikátum regiszter értéke 1
+Vezérlési elõrejelzés:
+Pld. elágazás esetén LOAD utasítás:
+o A Compiler kihozza a LOAD utasítás elágazás elé
+o Az eredeti helyre egy ellenõrzõ (check) utasítást tesz
+o RAM késleltetés csökkentése!
+Adat spekuláció
+LOAD lehet spekulatív jellegû
+? veszélyeztethetné a regiszter tartalmat
+Kiküszöbölés: speciális táblázat segítségével követik az aktuális regiszter tartalom hovatartozását.
+Szoftver futószalag: olyan technika mellyel a ciklusmagot lehet párhuzamosan végrehajtani (cikluson belüli párhuzamosság)
+9. Elõadás
+Elõzõ óra végének összefoglalása (intel itanium):
+1) Elõre jelzett végrehajtás (predicated execute)
+2) Control speculation (LOAD)
+3) DATA scepulation (speciális táblázat segítségével ellenõrzi a betöltött adatokat)
+4) Szoftver futószalag – arra szolgál, hogy a COMPILER segítségével, ciklusmagot ki tudja bontani, párhuzamosságát meg tudja oldani
+34
+Végrehajtási Modell (Intel Itanium esettanulmány)
+VLIW-eket Integrity rendszerekben és RAS szerverekben használják (reliability, availability, serviceability)
+o Nem maradt több kimeríthetõ párhuzamosság.
+o Az extenzív források kimerültek az általános célú alkalmazásokban.
+Új irány: frekvencia erõteljes növelése
+PIII (pentium 3) 1333Hz 10 fokozatú futószalag, SSE, P6 architektúra
+Kiépítettek egy teljesen új architektúrát a mérnökök: Netburst architektúra
+P4 1700 MHz, 20 fokozatú futószalag
+Frekvencia erõteljes növelésének 2 módja:
+1) csíkszélesség csökkentése:
+? 180nm => 65 nm (ez 0,7-szeres csökkentés)
+2) futószalag fokozatok hosszának a csökkentése
+? egymás utáni NAND kapuk száma (ez a futószalag hossza)
+? Amennyi idõ alatt a „jel” átér
+A maximális frekvenciát a leghosszabb futószalag fokozat határozza meg
+35
+Netburst architektúra
+o CISC architektúra
+o 1-17 byte utasítások
+o belül RISC mag
+o 8 db. látható regiszter
+cél: 10GHz elérése (ma már tudjuk, hogy ez nem lehetséges, max: 3-4 GHz-es procik)
+Újdonságok
+1) Hyper futószalag technológia 20-31 fokozat
+? Elõnye: nagy sebesség
+? Hátrány: „nagy” büntetés (hibás elõrejelzés esetén)
+2) Rapid Execution engine
+? Új elágazásbecslõ technológia, ennek köszönhetõen 33%-kal csökken a hibás elõrejelzések száma a PIII-hoz képest.
+3) Quad Data Rate Bus .
+Hátrány új kihívások:
+1) Statikus disszipáció a tranzisztorokon jelentkezõ szivárgási áram.
+o Exponenciálisan nõ
+o A 4 GHz-tõl hagyományos eszközökkel nem kezelhetõ
+? Hõ katasztrófa következett be 3,8 – 4 GHz-nél
+2) Futószalag fokozatok száma sem növelhetõ, max 31 fokozat.
+Statikus disszipáció kezelése
+1) Disszipáció csökkentése
+? Dinamikus feszültség és frekvencia skálázás bevezetése (DFVS – dynamic frekvency and voltage scaling)
+Esettanulmány P4 Willemette
+? 2000 november 1,7 GHz
+? Bár hatékonyságában alulmaradt az AMD-vel szemben a jóval magasabb frekvenciának köszönhetõen a teljesítmény jobb volt
+? Hõ veszteség kezelése: Thermal monitor rendszer: órajel moduláción alapuló megoldás
+Jellegzetességek:
+1) Hyper futószalag
+? nincs benne a dekódoló fokozat, mert a dekódolás futószalagon kívül történik
+2) Execution Trace cache (nyomkövetõ gyorsító tár), hosszú futószalag hatékonyságának növeléséhez
+? a RISC –szerû utasításokat gyorsító tárazzák
+3) Enhanced Branch Prediction (94-97% pontossággal mûködött)
+4) Quad Data Rate Bus
+5) Rapid execution engine
+? gyorsított FX integer VE, 2 db van belõle
+? 1 db hagyományos VE
+36
+6) Replay system
+A CPU magban ütemezõk találhatók. Az ütemezõk döntik el, hogy a RISC-szerû utasítások készen állnak-e a végrehajtásra.
+Ha a RISC utasítás sikertelen, akkor egy speciális sorba lesz állítva (replay queue) és visszakerül az ütemezõhöz.
+Cél: a futószalag leállásának és kimerülésének elkerülése (mert az „nagy büntetés” lenne)
+Új SIMD utasításkészlet
+? SSE2, 144 új utasítás
+? támogatja a 8/16/32 bites Integer és a 32/64 bites FP mûveleteket
+4 részbõl áll:
+? Memória alrendszer
+? Bemeneti rész
+? Sorrenden kívüliséget vezérlõ rész
+? Végrehajtó egység
+37
+10.Elõadás
+Szálszinten párhuzamos architektúrák
+Cél: sebesség növelés ? több tranzisztor
+Eszközök:
+? Pipeline,
+? Több VE,
+? Nagyobb cache,
+? Out of Order (sorrenden kívüli végrehajtás)
+? Branch prediction
+Több tranzisztor következménye:
+? Magasabb fogyasztás.
+? Nagyobb lapkaméret.
+Funkcionális párhuzamosság Szemcsézettségi szint
+Utasítás szinten (ILP )
+Finom
+Szál vagy folyamat szinten
+felhasználói szinten
+Durva
+Párhuzamosság formái:
+? implicit: a programozó nem tudja, hogy párhuzamos lesz
+o futószalag
+o VE-ek többszörözése
+o szál szinten párhuzamos szálak folyamatok szintje
+? explicit: programozó szándékosan párhuzamos futtatására alkalmas programot ír
+o vezérlõ tokenek segítségével (FORK, JOIN)
+Definíció: a szál a program legkisebb önállóan végrehajtató része!
+Alacsony szintû párhuzamosság: párhuzamos architektúrák segítségével valósítható meg, illetve fordító programok segítségével
+Magasabb szintû párhuzamosság: többszálas operációs rendszerek alatti konkurens, vagy párhuzamos végrehajtással hasznosítható
+HT (Hyper Threading): XP megjelenése elõtt kezdték fejleszteni
+Koncepció: vegyünk több szálat
+Párhuzamos szálak származtatása:
+Különbözõ alkalmazásokból
+(Multi programozás)
+Ugyanabból az alkalmazásból. Folyamat illetve szálszinten párhuzamos feldolgozás (Multi threading/Multi testing)
+38
+Többszálúság:
+Szoftveres:
+Többszálú app-ok vagy OS-ek futtatása egyszálú CPU-n párhuzamosan
+Hardveres:
+többszálú app-ok vagy OS-ek futtatása többszálú CPU-n egy idõben párhuzamosan.
+SMP (Simmetric Multiprocessing)
+SMT (Simultaneous Multi threading)
+Task: A folyamatokat task-nak is nevezzük. A folyamtok közti váltás sok idõt vesz igénybe.
+Taskok állapotát laptáblák tartalmazzák TLB (lapkezelõ segéd puffer).
+Szál szinten párhuzamos architektúrák osztályozása
+? Finoman szemcsézett: két vagy több szálat futtat párhuzamosan, és minden óraciklusban válta következõre.
+? Durván szemcsézett: SOEMT (switch on Event MT) – valamilyen esemény váltja ki a váltást
+? SMT (simultan multi threading): egyszerre futtatja mind a kettõt
+Feltétele:
+o párhuzamos mûveletek hardveres támogatás (pld. több VE)
+o Magonként 6 VE
+Többszálú végrehajtást támogató CPU-k
+Pld.: szükség van annyi PC-re (program counter) és regiszter tárolóra ahány szálat futtatunk ? váltás taskok között nem vesz idõt igénybe, hiszen mindegyiknek meg van a saját cache, regiszter tárolója PC-je, nem kell a töltéssel betöltéssel bajlódni. (SMT, illetve finoman szemcsézett esetén)
+P4
+SMT
+2002
+2 szál
+Itanium
+Durván szemcsézett
+2006
+2 szál
+IBM Power 5
+SMT
+2004
+2 szál
+IBM Power 7
+SMT
+2010
+4 szál
+Ultraspark
+Finoman szemcsézett
+2007
+8 szál
+39
+SMT elõnyei: mindössze 5-10% hardver komplexitás növelést igényel. Elérhetõ teljesítménynövekedés 0-20%.
+SMT:
+? Támogatja a soron kívüli végrehajtást
+? (HT technológia az SMT technológia egyik megvalósítási formája, 2 logikai CPU)
+? A CPU 2 architektúrális állapotot tárol.
+? 3 üzemmód:
+o ST0
+o ST1
+o MT: mind a két szál egyszerre fut
+? Az üzemmódok közötti váltás a HALT utasítással történik, ez megszakítja a CPU futását és energiatakarékos állapotba teszi azt
+Megvalósítási célok:
+1 Kis magméret növekedés
+2 Egyik szál várakozása esetén a másik szál gond nélkül folytathassa a végrehajtást
+3 Egy sál futtatása esetén a sebesség ne csökkenjen
+Ezek eléréséhez a fõ futószalag fokozatokat átmeneti pufferek választják el egymástól
+Attól függ, hogy melyik logikai CPU aktív.
+40
+HT mûködési modell
+? 2db logikai processzor (LP)
+? Minden utasítás valamelyik LP-hez kerül hozzárendelésre.
+? Az utasításokat a CPU címkékkel látja el.
+? Excecution Trace Cache: közös erõforrás (osztottan használják).
+? Program Counter (utasítás számláló) többszörözve van (kettõ van belõle)
+11.heti elõadás
+Szálszinten párhuzamos architektúrák Hyper Threading logikai modellje:
+ITLB: -Elõoldali utasítás címfordító puffer
+IP –instruction pointer
+Folyamat szinten párhuzamos architektúrák
+(MIMD architektúra)
+Közös memória használatú
+UMA, cc-NUMA
+Minden CPU számára látható közös memória.
+Elosztott memória használatú
+nc-NUMA
+Ha nincs ilyen közös memória, akkor a folyamatok üzenetek segítségével kommunikálnak egymással (ezek az üzenetküldésen alapuló multiprocesszoros rendszerek).
+Fejlesztési motivációk:
+1. Branch prediction soha nem 100%, mindig elõfordulhat hiba (utasítás szintû párhuzamosság egyik korlátja)
+2. A tipikus programokban lévõ párhuzamosság már ahhoz sem elegendõ, hogy rendelkezésre álló VE-eket maximálisan kihasználja (általában 4-8 VE egy processzorban)
+41
+3. Energia hatékonyság pld: órajel frekvencia 10-15%-os növelése kb. 50%-os energia teljesítménynövekedést eredményez. Ezért hatékonyabb lehet N db CPU-t használni egységnyi órajellel, mint 1 db N-szeres teljesítményû CPU-t.
+4. Költséghatékonyság jól párhuzamosítható feladatok esetén olcsóbb sok olcsó CPU-ból összerakni egy rendszert (és hatékonyabb), mint egy db gyors, de drága CPU-ból.
+5. Egyszerû bõvíthetõség.
+6. Hibatûrés.
+Korlátok
+Szoftver esetén: vezérlés áramlásos rendszerben a párhuzamosság felderítését szoftveresen kell megoldani!
+1. Fejlesztünk olyan compilert amely automatikusan felderíti a folyamatokban található párhuzamos részeket és ennek megfelelõ kódokat generál (FORK, JOIN)
+2. A programozóra bízzuk, hogy õ helyezze el az elágazásokat.
+Amdahl törvénye: Mekkora teljesítménynövekedést tudunk elérni egy N processzoros rendszerben, az 1 CPU-shoz képest.
+Egy folyamat része (P) párhuzamosítható (1-P)-ed része szekvenciálisan végrehajtható. Legyen a futási idõ egy CPU-n egy egység.
+N CPU esetén a futási idõ (1-P) + (P/N) => ebbõl kiszámíthatjuk a teljesítménynövekedést: ????(??)= 1(1-??)+????
+Példa: van 100 CPU a rendszerünkben és szeretnénk a programunkat 50-szer gyorsabban futtatni, mint egy CPU-n. N = 100, Sp(N) = 50 ??= ????(??)-1????(??)- ????-1=0,9898
+=>(1-P) = kb. 1,01% => kb. csak a 1% ami szekvenciálisan futtatandó
+Más számértékkel: Sp (N) = 10 => (1-P) = kb. 9,1%
+Tegyük fel, hogy a program 5%-a szekvenciális
+N= 100 esetén a gyorsulás kb. 16,8-szeres, N -> ? max. gyorsulás 20-szoros!
+Más számértékekkel:
+1-P = 10% => Sp (N)max = 10, 1-P= 50%
+1-P = 50% Sp(n)max = 2 (csak kétszeres növekedés)
+42
+Memória mûveletek alapján
+1. Ha a memória mûveletek ideje azonos, akkor UMA (uniform memroy access) multiprocesszoros rendszer. Itt nincs jelentõsége, hogy az adat hova kerül a memóriában! Ugyanannyi ideig tart az írás és az olvasás minden folyamat számára.
+2. Ha nem azonos a memória mûveletek ideje akkor NUMA multiprocesszoros rendszer. Fontos, hogy a memóriába írt adat, mind az õt író, illetve olvasó „közel” legyen a CPU-hoz
+Közös memória használatú rendszer:
+Általában max 8-16 CPU
+Elosztott memória csomópont
+Közös címtér, ami tartományokra van osztva és ezek az egyes csomópontokhoz vannak rendelve.
+NUMA rendszer két altípusa:
+1. cc-NUMA: cache coherent NUMA
+2. nc- NUMA: non- cache coherent NUMA
+A két rendszer a távoli memóriák adatainak kezelésében tér el egymástól. A ccNUMA mindig nyilvántartja, hogy hol található egy bizonyos adat legfrissebb példánya (másolatok szinkronban tartása). Ez viszont komoly adminisztrációval jár! -> ez korlátozza a skálázhatóságot.
+cc-NUMA az UMA rendszerek skálázható kiterjesztése
+Korlátok:
+UMA + CPU terheli a teljes buszrendszert. Valós skálázhatóságot a NUMA rendszerek biztosítanak. NUMA
+? elõny: tervezése és építése sokkal könnyebb
+? hátrány: programozása sokkal nehezebb
+NUMA támogatás:
+1. szoftveres operációs rendszerekben (szerver szoftverek)
+2. hardveres
+? CPU beépített (pld.: AMD opteron)
+? Chipsettel megvalósítható (Intel Itanium CPU)
+43
+13. Elõadás
+Gyorsító tárak
+Gyorsító tárak (cache): átmeneti tárolók, gyors, a felhasználó számára láthatatlan. Alapvetõ szerepük: a forgalom gyorsítása és egyenletessé tétele.
+1980 és 2000 között a CPU sebessége 1 000 000 szorosára nõtt, míg a memória elérési sebessége csak 100 szorosára.
+Regiszter
+Cache
+Memória
+Háttértárak
+Backup Rendszerek
+Átmeneti tárolás gyors, a felhasználó számára láthatatlan.
+Adatátvitel: Az adatátvitel a cache és a CPU között blokkos formában zajlik.
+Cache Típusok:
+? Utasítás cache: L1
+? Adat cache: L1
+? Mixed cache: L2, L3
+Cache-ban tároljuk: A memória egymást követõ rekeszeinek a tartalmát, azok tároló helybeli címével együtt.
+Visszakeresés módja:
+? Tartalom szerinti keresés asszociatív
+? A vizsgált adat cache-ban tárolt adattal való egyezését vizsgálja
+Hatékonyság:
+Ha a keresett adat a cache-ban megtalálható. Elfogadott hibaarány < 10%.
+Találat (cache hit) száma függ:
+? a cache méretétõl,
+? a szervezés módjától.
+Cache tartalmának cseréjekor a megfelelõ helyettesítési stratégia kell (replacement policy). Cache miss esetén az optikai tárból a CPU betölti az adatot a regiszterbe, illetve a cache-ba.
+A visszakeresés a keresett adat címe alapján történik. A cím egy részét el kell tárolni oly módon, és akkora részét, amelynek alapján az közvetlenül (a tárolt értékbõl), vagy közvetve (a tárolt értékbõl, és a cache-ban való elhelyezkedésébõl) a memóriablokk kezdõ címe meghatározható legyen.
+A címnek ezt a részét tag-nek nevezik. Ennek az összehasonlításával történik a választás. A tag származhat valós illetve fizikai címbõl is.
+Fizikai ill virtuális cím attól függ, hogy a cache-ban a CPU és a címfordító egység (MMU, memory management unit) között, vagy az MMU és az operatív tár között helyezkedik el.
+CPU közvetlenül kezeli
+File system swapping
+Archiválás
+44
+Virtuális tag: csökkenti a cache miss késleltetését, de a virtualizációból adódó helyettesítést is kezelni kell.Szuperskalárokból a fizikai tagging az általános.
+Cacheben tároljuk:
+? Adatot
+? Taget
+? Állapot infókat (adatok állapotára)
+o Vezérlést kiszolgáló bitek
+o Helyettesítési eljárást kiszolgáló bitek
+Két legfontosabb:
+o V-bit (validate)
+o D-bit (dirty bit)
+Validate bit: cache tartalmának érvényessége (blokk, cella, byte). Érvényes az adat, ha a megadott tárolóban az ottani adattal egyezõ, és akkor tartozik cache törléshez v bit (0), Minden blokkhoz min 1 V bit, de akár minden bájthoz is.
+Dirty bit: A cache blokkok valamelyik részének módosítását, felülírását jelenti. Az ilyen blokk helyére nem lehet új adatot betölteni, elõbb a régit ki kell menteni az operatív tárba.
+Cache jellemzõi:
+? Mérete (23 kbyte – 20 mb)
+? Elhelyezkedése (on chip, off chip)
+? Blokk mérete (1 egységben mozgatott adatmennyiség, 4-64 byte, utasítás ill adat esetén különbözõ lehet)
+? Sor (cella) méret (az az adatmennyiség, amely 1-1 összehasonlításnál kijelölhetõ, <= blokk mérete)
+? Helyettesítési algoritmus:
+o FIFO
+o LRU: Least recently used (legkevésbé használt)
+o Legritkábban hasznát adat
+? Adat aktualizálási módszer (write strategy)
+o Write through
+o Write back
+? Koherencia mechanizmus: meghatározza azt a módszert, amellyel biztosítani lehet a cache és az operatív tár egyezõségét tartalmilag.
+Cache típusok:
+1, Full assotiative cache:
+A beolvasott blokk bármelyik sorban elhelyezhetõ. Az elhelyezést algoritmus határozza meg. Amikor a CPU adatot keres, akkor a tag-et vizsgálja. Minden sort egyszerre vizsgál. Ezért a cache-hoz olyan áramkör tartozik, amely n db párhuzamos összehasonlító áramkört tartalmaz.
+Elõnye:
+? Igen jó találati pontosság
+? Rugalmas
+45
+Hátránya:
+? Sok összehasonlító áramkör
+? Drága
+2, Direkt Mapping (közvetlen leképezésû cache)
+Egy utas asszociatív cache
+Itt 1-1 blokk csak 1 meghatározott helyre kerülhet.
+A blokk helyét a blokk sorszáma határozza meg.
+Elõnye:
+? Gyors visszakeresés
+? Egyszerû és olcsó
+Hátránya:
+? Merev
+? Alacsony találati arány
+3, Set associative cache
+N utas asszociatív cache. Pl 2 utas asszociatív cache esetén minden blokk 2 helyre kerülhet.
+Adat A
+Adat A
+Adat B
+Adat B
+Adat C
+Adat C
+Adat D
+Adat D
+Általában 2-8 utas. Csoport index alapján kijelöli az indexnek megfelelõ csoportot. Annak összes sorában egyidejûleg keres.
+Elõnye:
+? Rugalmas
+? Gyors
+? Kevés összehasonlító áramkör
+2 Utas 8 Utas
+1 csoportban 8 blokk
+1 csoportban 8 blokk
+Kisebb találati arány
+Nagyobb találati arány
+Gyorsabb keresés
+Lassabb keresés (akár 4x)
+Minden 2. letöltés az 1-ik cella felülírását jelenti
+4, Sector mapping cache
+- Csoportok asszociatívan oszthatóak ki.
+- Csoporton belül a blokkok fixek.
+Memória hierarchia:
+46
+Cache line:
+Directory entry
+Data
+TAG
+TPORT
+DPORT
+STATE
+DATA
+Tag protection
+Data protection
+Állapot érték
+pl V-bit, D-bit
+cache szervezés:
+- Excluseive
+- Inclusive
